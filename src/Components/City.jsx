@@ -46,7 +46,7 @@ const City = () => {
   const showUsers = () => {
     setLoading(true);
     axios
-      .get("http://localhost:8000/getdataUniversity")
+      .get("http://localhost:8000/getdataCity")
       .then((res) => {
         setUserData(res.data.data);
         setLoading(false);
@@ -69,7 +69,7 @@ const City = () => {
     };
 
     axios
-      .post("http://localhost:8000/addUniversity", newData)
+      .post("http://localhost:8000/addCity", newData)
       .then((res) => {
         console.log("Data Added:", res.data);
         alert("Data Added Successfully!");
@@ -91,7 +91,7 @@ const City = () => {
   const deletedata = (_id) => {
     if (window.confirm("Are you sure you want to delete this record?")) {
       axios
-        .delete(`http://localhost:8000/deleteUniversity/${_id}`)
+        .delete(`http://localhost:8000/deleteCity/${_id}`)
         .then((res) => {
           console.log("User Deleted:", res.data);
           alert("User Deleted");
@@ -102,18 +102,6 @@ const City = () => {
           alert("Failed to delete user. Please check your network connection or try again.");
         });
     }
-  };
-
-  // Copy data to clipboard
-  const handleCopy = () => {
-    const dataToCopy = userData
-      .map((a, index) => `${index + 1},  ${a.city_name}, ${a.status}`)
-      .join("\n");
-
-    navigator.clipboard
-      .writeText(dataToCopy)
-      .then(() => alert("Data copied to clipboard!"))
-      .catch(() => alert("Failed to copy data."));
   };
 
   // Export to Excel
@@ -265,19 +253,16 @@ const City = () => {
         {/* Export Buttons */}
         <Col md={6} className="">
           {/* <ButtonGroup aria-label="Export Buttons"> */}
-            <Button variant="primary" onClick={handleCopy} className="">
-              Copy
-            </Button>
             <CSVLink data={csvData} filename={"technology-data.csv"} className="">
               <Button variant="primary">CSV</Button>
             </CSVLink>
-            <Button variant="primary" onClick={handleExcel} className="">
+            <Button variant="primary" onClick={handleExcel} className="ms-1">
               Excel
             </Button>
-            <Button variant="primary" onClick={handlePdf} className="">
+            <Button variant="primary" onClick={handlePdf} className="ms-1">
               PDF
             </Button>
-            <Button variant="primary" onClick={() => window.print()} className="">
+            <Button variant="primary" onClick={() => window.print()} className="ms-1">
               Print
             </Button>
           {/* </ButtonGroup> */}
@@ -312,7 +297,7 @@ const City = () => {
                 <thead>
                   <tr>
                     <th>Sr.No</th>
-                    <th>University Name</th>
+                    <th>City Name</th>
                     <th>Status</th>
                     <th className="text-center">Action</th>
                   </tr>

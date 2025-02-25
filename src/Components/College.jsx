@@ -112,18 +112,6 @@ const College = () => {
     }
   };
 
-  // Copy data to clipboard
-  const handleCopy = () => {
-    const dataToCopy = userData
-      .map((a, index) => `${index + 1},  ${a.university_name}, ${a.college_name}, ${a.city_name} ${a.status}`)
-      .join("\n");
-
-    navigator.clipboard
-      .writeText(dataToCopy)
-      .then(() => alert("Data copied to clipboard!"))
-      .catch(() => alert("Failed to copy data."));
-  };
-
   // Export to Excel
   const handleExcel = () => {
     const worksheet = XLSX.utils.json_to_sheet(
@@ -235,9 +223,9 @@ const College = () => {
               <Row>
                 
                 <Col md={12}>
-                  <Form.Label>University ID</Form.Label>
+                  <Form.Label>University Name</Form.Label>
                   <Form.Control
-                    type="text"o
+                    type="text"
                     placeholder="Enter University ID"
                     value={university_name}
                     onChange={(e) => setUniversityName(e.target.value)}
@@ -301,19 +289,16 @@ const College = () => {
         {/* Export Buttons */}
         <Col md={6} className="">
           {/* <ButtonGroup aria-label="Export Buttons"> */}
-            <Button variant="primary" onClick={handleCopy} className="">
-              Copy
-            </Button>
-            <CSVLink data={csvData} filename={"College-data.csv"} className="">
+            <CSVLink data={csvData} filename={"College-data.csv"} className="ms-1">
               <Button variant="primary">CSV</Button>
             </CSVLink>
-            <Button variant="primary" onClick={handleExcel} className="">
+            <Button variant="primary" onClick={handleExcel} className="ms-1">
               Excel
             </Button>
-            <Button variant="primary" onClick={handlePdf} className="">
+            <Button variant="primary" onClick={handlePdf} className="ms-1">
               PDF
             </Button>
-            <Button variant="primary" onClick={() => window.print()} className="">
+            <Button variant="primary" onClick={() => window.print()} className="ms-1">
               Print
             </Button>
           {/* </ButtonGroup> */}

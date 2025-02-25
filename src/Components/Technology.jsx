@@ -4,7 +4,7 @@ import { Button,  Col, Container, Form, Row, Table } from "react-bootstrap";
 import Pagination from "react-bootstrap/Pagination";
 import { AiFillDelete } from "react-icons/ai";
 import { GrEdit } from "react-icons/gr";
-import { useNavigate } from "react-router-dom";
+import { useNavigate , useParams } from "react-router-dom";
 import { CSVLink } from "react-csv";
 import * as XLSX from "xlsx";
 import Modal from "react-bootstrap/Modal";
@@ -13,6 +13,22 @@ import "jspdf-autotable";
 
 const Technology = () => {
   const [show, setShow] = useState(false);
+
+     const navigate = useNavigate()
+    const {_id} = useParams("");
+
+    const handleShow = () => setShow(true);
+
+  const [userData, setUserData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
+
+  const [name, setName] = useState("");
+  const [status, setStatus] = useState("active"); // Default status
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [searchTerm, setSearchTerm] = useState(""); // Search input value
+
   const handleClose = () => {
     if (  name || status !== "active") {
       if (window.confirm("Are you sure you want to discard changes?")) {
@@ -24,28 +40,49 @@ const Technology = () => {
       setShow(false);
     }
   };
-  const handleShow = () => setShow(true);
-
-  // const [userData, setUserData] = useState([]);
-  // const [loading, setLoading] = useState(true);
-  // const [currentPage, setCurrentPage] = useState(1);
-  // const [itemsPerPage] = useState(10); // Adjust as needed
-  // const navigate = useNavigate();
-  const [userData, setUserData] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10;
-  const navigate = useNavigate();
-
-  const [name, setName] = useState("");
-  const [status, setStatus] = useState("active"); // Default status
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [searchTerm, setSearchTerm] = useState(""); // Search input value
+  
 
   // Fetch data on component mount
   useEffect(() => {
     showUsers();
   }, []);
+
+  useEffect(() => {
+    axios.get(`http://localhost:8000/getupdateservices/${_id}`)
+     .then(res =>{
+        const data = res.data.userData
+        console.log("link", res.data);
+
+        setName(data.name || " ");
+        setStatus(data.status || " ");
+     }).catch(err =>{
+        console.log(err);
+     })
+}, [_id])
+
+       const handleUpdate = (e)=> {
+        e.preventDefault()
+    
+        const userData={
+          name,
+          status,
+        }
+    
+    axios.put(`http://localhost:8000/updateservices/${_id}`, userData)
+      .then(res => {
+        console.log("hi",res.data);
+        // setUserData(res.data.userdata)
+        alert('Data Add Successfully!');
+        // navigate("/");
+        setName("");
+        setStatus("active");
+        handleClose();
+        showUsers(); // Refresh the table
+      })
+      .catch(err => {
+        console.log(err);
+      })
+    }
 
   // Fetch data from the API
   const showUsers = () => {
@@ -65,29 +102,7 @@ const Technology = () => {
 
 
 
-  // const handleUpdate(e) {
-  //   e.preventDefault()
-    
-  //   const userData = {
-      
-  //     name,
-  //     status,
-  //   };
 
-  //   axios.put(`http://localhost:8000/UpdateTechnology/${_id}`, userData)
-  //   .then(res => {
-  //    console.log("hi",res.data);
-  //    // setUserData(res.data.userdata)
-  //    alert('Data Add Successfully!');
-  //    setName("");
-  //    setStatus("active");
-  //    handleClose();
-  //    showUsers(); // Refresh the table
-  //  })
-  //  .catch(err => {
-  //    console.log(err);
-  //  })
-  // }
 
   // Handle form submission
   const handleSubmit = (e) => {
@@ -287,10 +302,10 @@ const Technology = () => {
           </Modal.Footer>
         </Modal>
 
-        {/* <Modal show={show} onHide={handleClose}>
-          <Modal.Header closeButton>
-            <Modal.Title>Add Technology</Modal.Title>
-          </Modal.Header>
+        <Modal show={show} onHide={handleClose}>
+          {/* <Modal.Header closeButton>
+            <Modal.Title></Modal.Title>
+          </Modal.Header> */}
           <Modal.Body>
             <Form onSubmit={handleUpdate}>
               <Row>
@@ -329,15 +344,15 @@ const Technology = () => {
               </Row>
             </Form>
           </Modal.Body>
-          <Modal.Footer>
+          {/* <Modal.Footer>
             <Button variant="secondary" onClick={handleClose}>
               Close
             </Button>
             <Button variant="primary" onClick={handleSubmit} disabled={isSubmitting}>
               {isSubmitting ? "Saving..." : "Save Changes"}
             </Button>
-          </Modal.Footer>
-        </Modal> */}
+          </Modal.Footer> */}
+        </Modal> 
 
         {/* Export Buttons */}
         <Col md={8} className="">
@@ -374,9 +389,7 @@ const Technology = () => {
            
           {/* </div> */}
         </Col>
- {/* <Button variant="primary" onClick={handleSearch} className="ms-2">
-              Search
-            </Button> */}
+ 
         {/* Table */}
         <Col md={12} lg={12} lx={12} lxx={12} className="mt-3">
           {loading ? (
@@ -399,12 +412,13 @@ const Technology = () => {
                       <td>{a.name}</td>
                       <td>{a.status}</td>
                       <td className="d-flex justify-content-evenly">
-                        <Button
-                          variant="warning"
-                          onClick={() => navigate(`/Head/Update_pricing/${a.id}`)}
-                        >
-                          <GrEdit />
-                        </Button>
+                      <button className="btn btn-warning my-1 "
+                        onClick={() => {
+                          navigate(`/Head/${a._id}`)
+                        }}
+                      >
+                        <GrEdit />
+                      </button>
                         <Button variant="danger" onClick={() => deletedata(a._id)}>
                           <AiFillDelete />
                         </Button>
@@ -424,30 +438,14 @@ const Technology = () => {
               Showing {showingFrom} to {showingTo} of {totalEntries} entries
             </div>
           </Col>
-          {/* <Col md={6} className="d-flex justify-content-end">
-            <Pagination>
-              <Pagination.Prev
-                disabled={currentPage === 1}
-                onClick={() => handlePageChange(currentPage - 1)}
-              >
-                Previous
-              </Pagination.Prev>
-              {paginationItems}
-              <Pagination.Next
-                disabled={currentPage === totalPages}
-                onClick={() => handlePageChange(currentPage + 1)}
-              >
-                Next
-              </Pagination.Next>
-            </Pagination>
-          </Col> */}
+         
 
         <Col md={6} className="d-flex justify-content-end">
           <Pagination>
             <Pagination.Prev
               disabled={currentPage === 1}
               onClick={() => setCurrentPage(currentPage - 1)}
-            />
+            >Previous</Pagination.Prev>
             {[...Array(totalPages)].map((_, index) => (
               <Pagination.Item
                 key={index + 1}
@@ -460,7 +458,7 @@ const Technology = () => {
             <Pagination.Next
               disabled={currentPage === totalPages}
               onClick={() => setCurrentPage(currentPage + 1)}
-            />
+            >Next</Pagination.Next>
           </Pagination>
         </Col>
         </Row>
@@ -470,3 +468,156 @@ const Technology = () => {
 };
 
 export default Technology;
+
+// import axios from "axios";
+// import React, { useEffect, useState } from "react";
+// import { Button, Col, Container, Form, Row, Table, Modal } from "react-bootstrap";
+// import Pagination from "react-bootstrap/Pagination";
+// import { AiFillDelete } from "react-icons/ai";
+// import { GrEdit } from "react-icons/gr";
+// import { CSVLink } from "react-csv";
+// import * as XLSX from "xlsx";
+// import jsPDF from "jspdf";
+// import "jspdf-autotable";
+
+// const Technology = () => {
+//   const [show, setShow] = useState(false);
+//   const [editMode, setEditMode] = useState(false);
+//   const [editId, setEditId] = useState(null);
+//   const [userData, setUserData] = useState([]);
+//   const [loading, setLoading] = useState(true);
+//   const [currentPage, setCurrentPage] = useState(1);
+//   const itemsPerPage = 10;
+//   const [name, setName] = useState("");
+//   const [status, setStatus] = useState("active");
+//   const [isSubmitting, setIsSubmitting] = useState(false);
+//   const [searchTerm, setSearchTerm] = useState("");
+
+//   useEffect(() => {
+//     showUsers();
+//   }, []);
+
+//   const showUsers = () => {
+//     setLoading(true);
+//     axios.get("http://localhost:8000/getdata")
+//       .then((res) => {
+//         setUserData(res.data.data);
+//         setLoading(false);
+//       })
+//       .catch(() => {
+//         setLoading(false);
+//         alert("Failed to fetch data.");
+//       });
+//   };
+
+//   const handleClose = () => {
+//     setShow(false);
+//     setEditMode(false);
+//     setEditId(null);
+//     setName("");
+//     setStatus("active");
+//   };
+
+//   const handleShow = () => setShow(true);
+
+//   const handleEdit = (id) => {
+//     const item = userData.find((u) => u._id === id);
+//     if (item) {
+//       setName(item.name);
+//       setStatus(item.status);
+//       setEditId(id);
+//       setEditMode(true);
+//       setShow(true);
+//     }
+//   };
+
+//   const handleSubmit = (e) => {
+//     e.preventDefault();
+//     setIsSubmitting(true);
+//     const data = { name, status };
+
+//     if (editMode) {
+//       axios.put(`http://localhost:8000/updateservices/${editId}`, data)
+//         .then(() => {
+//           alert("Data Updated Successfully!");
+//           handleClose();
+//           showUsers();
+//         })
+//         .catch(() => alert("Failed to update data."))
+//         .finally(() => setIsSubmitting(false));
+//     } else {
+//       axios.post("http://localhost:8000/technologypost", data)
+//         .then(() => {
+//           alert("Data Added Successfully!");
+//           handleClose();
+//           showUsers();
+//         })
+//         .catch(() => alert("Failed to add data."))
+//         .finally(() => setIsSubmitting(false));
+//     }
+//   };
+
+//   const deletedata = (id) => {
+//     if (window.confirm("Are you sure?")) {
+//       axios.delete(`http://localhost:8000/deleteTechnology/${id}`)
+//         .then(() => {
+//           alert("User Deleted");
+//           showUsers();
+//         })
+//         .catch(() => alert("Failed to delete user."));
+//     }
+//   };
+
+//   return (
+//     <Container className="mt-5">
+//       <Button variant="primary" onClick={handleShow}>Add Technology</Button>
+//       <Modal show={show} onHide={handleClose}>
+//         <Modal.Header closeButton>
+//           <Modal.Title>{editMode ? "Edit" : "Add"} Technology</Modal.Title>
+//         </Modal.Header>
+//         <Modal.Body>
+//           <Form onSubmit={handleSubmit}>
+//             <Form.Group>
+//               <Form.Label>Technology Name</Form.Label>
+//               <Form.Control type="text" value={name} onChange={(e) => setName(e.target.value)} required />
+//             </Form.Group>
+//             <Form.Group>
+//               <Form.Label>Status</Form.Label>
+//               <Form.Check type="radio" label="Active" name="status" value="active" checked={status === "active"} onChange={(e) => setStatus(e.target.value)} />
+//               <Form.Check type="radio" label="Inactive" name="status" value="inactive" checked={status === "inactive"} onChange={(e) => setStatus(e.target.value)} />
+//             </Form.Group>
+//             <Button type="submit" disabled={isSubmitting}>{isSubmitting ? "Saving..." : "Save Changes"}</Button>
+//           </Form>
+//         </Modal.Body>
+//       </Modal>
+
+//       {loading ? <p>Loading...</p> : (
+//         <Table striped bordered hover className="mt-3">
+//           <thead>
+//             <tr>
+//               <th>Sr.No</th>
+//               <th>Name</th>
+//               <th>Status</th>
+//               <th>Action</th>
+//             </tr>
+//           </thead>
+//           <tbody>
+//             {userData.map((a, index) => (
+//               <tr key={a._id}>
+//                 <td>{index + 1}</td>
+//                 <td>{a.name}</td>
+//                 <td>{a.status}</td>
+//                 <td>
+//                   <Button variant="warning" onClick={() => handleEdit(a._id)}><GrEdit /></Button>
+//                   <Button variant="danger" onClick={() => deletedata(a._id)}><AiFillDelete /></Button>
+//                 </td>
+//               </tr>
+//             ))}
+//           </tbody>
+//         </Table>
+//       )}
+//     </Container>
+//   );
+// };
+
+// export default Technology;

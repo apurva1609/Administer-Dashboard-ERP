@@ -104,17 +104,7 @@ const University = () => {
     }
   };
 
-  // Copy data to clipboard
-  const handleCopy = () => {
-    const dataToCopy = userData
-      .map((a, index) => `${index + 1}, ${a.university_id}, ${a.university_name}, ${a.status}`)
-      .join("\n");
-
-    navigator.clipboard
-      .writeText(dataToCopy)
-      .then(() => alert("Data copied to clipboard!"))
-      .catch(() => alert("Failed to copy data."));
-  };
+  
 
   // Export to Excel
   const handleExcel = () => {
@@ -265,19 +255,16 @@ const University = () => {
         {/* Export Buttons */}
         <Col md={6} className="">
           {/* <ButtonGroup aria-label="Export Buttons"> */}
-            <Button variant="primary" onClick={handleCopy} className="">
-              Copy
-            </Button>
             <CSVLink data={csvData} filename={"technology-data.csv"} className="">
               <Button variant="primary">CSV</Button>
             </CSVLink>
-            <Button variant="primary" onClick={handleExcel} className="">
+            <Button variant="primary" onClick={handleExcel} className="ms-1">
               Excel
             </Button>
-            <Button variant="primary" onClick={handlePdf} className="">
+            <Button variant="primary" onClick={handlePdf} className="ms-1">
               PDF
             </Button>
-            <Button variant="primary" onClick={() => window.print()} className="">
+            <Button variant="primary" onClick={() => window.print()} className="ms-1">
               Print
             </Button>
           {/* </ButtonGroup> */}

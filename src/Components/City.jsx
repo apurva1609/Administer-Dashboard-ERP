@@ -289,6 +289,7 @@ const City = () => {
             </Button> */}
         {/* Table */}
         <Col md={12} lg={12} lx={12} lxx={12} className="mt-3">
+        <h1 className="text-center text-primary fw-bold">City Data</h1>
           {loading ? (
             <p>Loading...</p>
           ) : (
@@ -334,12 +335,14 @@ const City = () => {
               Showing {showingFrom} to {showingTo} of {totalEntries} entries
             </div>
           </Col>
-          <Col md={6} className="d-flex justify-content-end">
+         
+
+        <Col md={6} className="d-flex justify-content-end">
           <Pagination>
             <Pagination.Prev
               disabled={currentPage === 1}
               onClick={() => setCurrentPage(currentPage - 1)}
-            />
+            >Previous</Pagination.Prev>
             {[...Array(totalPages)].map((_, index) => (
               <Pagination.Item
                 key={index + 1}
@@ -352,7 +355,7 @@ const City = () => {
             <Pagination.Next
               disabled={currentPage === totalPages}
               onClick={() => setCurrentPage(currentPage + 1)}
-            />
+            >Next</Pagination.Next>
           </Pagination>
         </Col>
         </Row>

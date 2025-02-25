@@ -180,11 +180,10 @@ const College = () => {
   // Handle search
   const handleSearch = () => {
     const filteredData = userData.filter((item) =>
-      item.college_id.toLowerCase().includes(searchTerm.toLowerCase())||
-      item.university_id.toLowerCase().includes(searchTerm.toLowerCase())||
+      item.university_name.toLowerCase().includes(searchTerm.toLowerCase())||
       item.college_name.toLowerCase().includes(searchTerm.toLowerCase())||
       item.city_name.toLowerCase().includes(searchTerm.toLowerCase())||
-    item.status.toLowerCase().includes(searchTerm.toLowerCase())
+      item.status.toLowerCase().includes(searchTerm.toLowerCase())
     );
     setUserData(filteredData); // Update the table data
   };
@@ -320,6 +319,7 @@ const College = () => {
  
         {/* Table */}
         <Col md={12} lg={12} lx={12} lxx={12} className="mt-3">
+          <h1 className="text-center text-primary fw-bold">College Data</h1>
           {loading ? (
             <p>Loading...</p>
           ) : (
@@ -369,12 +369,14 @@ const College = () => {
               Showing {showingFrom} to {showingTo} of {totalEntries} entries
             </div>
           </Col>
-          <Col md={6} className="d-flex justify-content-end">
+         
+
+        <Col md={6} className="d-flex justify-content-end">
           <Pagination>
             <Pagination.Prev
               disabled={currentPage === 1}
               onClick={() => setCurrentPage(currentPage - 1)}
-            />
+            >Previous</Pagination.Prev>
             {[...Array(totalPages)].map((_, index) => (
               <Pagination.Item
                 key={index + 1}
@@ -387,7 +389,7 @@ const College = () => {
             <Pagination.Next
               disabled={currentPage === totalPages}
               onClick={() => setCurrentPage(currentPage + 1)}
-            />
+            >Next</Pagination.Next>
           </Pagination>
         </Col>
         </Row>

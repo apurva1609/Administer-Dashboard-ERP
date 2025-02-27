@@ -19,17 +19,17 @@ const College = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10); // Adjust as needed
 
-  const [universityId, setUniversityName] = useState("");
+  const [university_name, setUniversityName] = useState("");
   const [college_name, setCollegeName] = useState("");
-  const [cityId, setCityName] = useState("");
+  const [city_name, setCityName] = useState("");
   const [status, setStatus] = useState("active"); // Default status
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [searchTerm, setSearchTerm] = useState(""); // Search input value
   const [editingId, setEditingId] = useState(null); // Track which ID is being edited
   const [categories, setCategories] = useState([]);
-  const [categoriesdata, setCategoriesData] = useState([]);
-  const [categoryData, setCategoryData] = useState([]);
-  const [category, setCategory] = useState([]);
+  // const [categoriesdata, setCategoriesData] = useState([]);
+  // const [categoryData, setCategoryData] = useState([]);
+  // const [category, setCategory] = useState([]);
 
 
   // Fetch Data from API
@@ -41,8 +41,9 @@ const College = () => {
     axios
       .get("http://localhost:8000/getdataUniversity")
       .then((res) => {
-        setCategoriesData(res.data.data); // Assuming the response contains a `data` array
-        setCategory(res.data.data);
+        // setCategoriesData(res.data.data);
+        setCategories(res.data.data);  // Assuming the response contains a `data` array
+        // setCategory(res.data.data);
         console.log("Categories fetched:", res.data.data);
       })
       .catch((err) => {
@@ -55,7 +56,7 @@ const College = () => {
       .get("http://localhost:8000/getdataCity")
       .then((res) => {
         setCategories(res.data.data); // Assuming the response contains a `data` array
-        setCategoryData(res.data.data);
+        // setCategoryData(res.data.data);
         console.log("Categories fetched:", res.data.data);
       })
       .catch((err) => {
@@ -94,7 +95,7 @@ const handleSubmit = (e) => {
   e.preventDefault();
   setIsSubmitting(true);
 
-  const newData = { universityId, college_name, cityId, status };
+  const newData = { university_name, college_name, city_name, status };
 
   if (editingId) {
     // Update existing technology
@@ -137,9 +138,9 @@ const handleSubmit = (e) => {
 
   const handleEdit = (item) => {
     setEditingId(item._id);
-    setUniversityName(item.universityId);
+    setUniversityName(item.university_name);
     setCollegeName(item.college_name);
-    setCityName(item.cityId);
+    setCityName(item.city_name);
     setStatus(item.status);
     setShow(true);
   };
@@ -219,9 +220,9 @@ const handleSubmit = (e) => {
   // const handleSearch = () => {
   //   const filteredData = userData.filter(
   //     (item) =>
-  //       item.universityId.university_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+  //       item.university_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
   //       item.college_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-  //       item.cityId.city_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+  //       item.city_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
   //       item.status.toLowerCase().includes(searchTerm.toLowerCase())
   //   );
   //   setUserData(filteredData); // Update the table data
@@ -229,9 +230,9 @@ const handleSubmit = (e) => {
 
   const handleSearch = () => {
   const filteredData = userData.filter((item) => {
-    const universityName = item.universityId?.university_name?.toLowerCase() || "";
+    const universityName = item.university_name?.toLowerCase() || "";
     const collegeName = item.college_name?.toLowerCase() || "";
-    const cityName = item.cityId?.city_name?.toLowerCase() || "";
+    const cityName = item.city_name?.toLowerCase() || "";
     const statusValue = item.status?.toLowerCase() || "";
 
     return (
@@ -283,7 +284,7 @@ const handleSubmit = (e) => {
                   <Form.Control
                     type="text"
                     placeholder="Enter University ID"
-                    value={universityId}
+                    value={university_name}
                     onChange={(e) => setUniversityName(e.target.value)}
                     required
                   /> */}
@@ -292,13 +293,13 @@ const handleSubmit = (e) => {
                     </Form.Label>
                     <Form.Select
                       aria-label="Select university"
-                      value={universityId}
+                      value={university_name}
                       onChange={(e) => setUniversityName(e.target.value)}
                       required
                     >
                       <option value="">Choose a university</option>
-                      {categoriesdata.map((university) => (
-                        <option key={university._id} value={university._id}>
+                      {categories.map((university) => (
+                        <option key={university._id} value={university.university_name}>
                           {university.university_name}
                         </option>
                       ))}
@@ -321,13 +322,13 @@ const handleSubmit = (e) => {
                     </Form.Label>
                     <Form.Select
                       aria-label="Select city"
-                      value={cityId}
+                      value={city_name}
                       onChange={(e) => setCityName(e.target.value)}
                       required
                     >
                       <option value="">Choose a city</option>
                       {categories.map((city) => (
-                        <option key={city._id} value={city._id}>
+                        <option key={city._id} value={city.city_name}>
                           {city.city_name}
                         </option>
                       ))}
@@ -427,10 +428,10 @@ const handleSubmit = (e) => {
                 </tr>
               </thead>
               <tbody>
-              {userData.length > 0 ? (
+              {/* {userData.length > 0 ? (
                 currentItems.map((product, index) => {
-                  const matchedCategory = categoryData.find((cat) => cat._id === product.cityId);
-                  const matched = category.find((cat) => cat._id === product.universityId);
+                  const matchedCategory = categoryData.find((cat) => cat._id === product.city_name);
+                  const matched = category.find((cat) => cat._id === product.university_name);
                   return (
                     
                   <tr key={product._id}>
@@ -459,7 +460,30 @@ const handleSubmit = (e) => {
                       No products found.
                     </td>
                   </tr>
-                )}
+                )} */}
+{currentItems.map((product, index) => {
+  return (
+<tr key={product._id}>
+                    <td>{index + 1 + (currentPage - 1) * itemsPerPage}</td>
+                    <td>{product.university_name} </td>
+                    <td>{product.college_name}</td>
+                    <td>{product.city_name} </td>
+                    <td>{product.status}</td>
+                    <td className="d-flex justify-content-evenly">
+                      <Button variant="warning" onClick={() => handleEdit(product)}>
+                        <GrEdit />
+                      </Button>
+                      <Button
+                        variant="danger"
+                        onClick={() => deletedata(product._id)}
+                      >
+                        <AiFillDelete />
+                      </Button>
+                    </td>
+                  </tr>
+                  )
+                })
+}
               </tbody>
             </Table>
           </div>

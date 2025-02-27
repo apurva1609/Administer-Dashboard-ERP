@@ -11,7 +11,7 @@ import Modal from "react-bootstrap/Modal";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
 
-const University = () => {
+const City = () => {
   const [show, setShow] = useState(false);
 
   const handleShow = () => setShow(true);
@@ -390,4 +390,4 @@ const University = () => {
   );
 };
 
-export default University;
+export default City;

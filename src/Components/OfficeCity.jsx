@@ -11,7 +11,7 @@ import Modal from "react-bootstrap/Modal";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
 
-const City = () => {
+const OfficeCity = () => {
   const [show, setShow] = useState(false);
 
   const handleShow = () => setShow(true);
@@ -20,7 +20,7 @@ const City = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10); // Adjust as needed
 
-  const [city_name, setCityName] = useState("");
+  const [office_city_name, setOfficeCityName] = useState("");
   const [status, setStatus] = useState("active"); // Default status
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [searchTerm, setSearchTerm] = useState(""); // Search input value
@@ -39,7 +39,7 @@ const City = () => {
   const showUsers = () => {
     // setLoading(true);
     axios
-      .get("http://localhost:8000/getdataCity")
+      .get("http://localhost:8000/getdataOfficeCity")
       .then((res) => {
         setUserData(res.data.data);
         // setLoading(false);
@@ -53,7 +53,7 @@ const City = () => {
   // Handle Modal Close
   const handleClose = () => {
     setShow(false);
-    setCityName("");
+    setOfficeCityName("");
     setStatus("active");
     setEditingId(null); // Reset editing state
   };
@@ -65,12 +65,12 @@ const City = () => {
     e.preventDefault();
     setIsSubmitting(true);
 
-    const newData = { city_name, status };
+    const newData = { office_city_name, status };
 
     if (editingId) {
       // Update existing City
       axios
-        .put(`http://localhost:8000/UpdateCity/${editingId}`, newData)
+        .put(`http://localhost:8000/UpdateOfficeCity/${editingId}`, newData)
         .then(() => {
           alert("City Updated Successfully!");
           showUsers();
@@ -81,7 +81,7 @@ const City = () => {
     } else {
       // Add new City
       axios
-        .post("http://localhost:8000/addCity", newData)
+        .post("http://localhost:8000/addOfficeCity", newData)
         .then(() => {
           alert("City Added Successfully!");
           showUsers();
@@ -96,7 +96,7 @@ const City = () => {
   const deletedata = (_id) => {
     if (window.confirm("Are you sure you want to delete this record?")) {
       axios
-        .delete(`http://localhost:8000/deleteCity/${_id}`)
+        .delete(`http://localhost:8000/deleteOfficeCity/${_id}`)
         .then(() => {
           alert("City Deleted");
           showUsers();
@@ -108,7 +108,7 @@ const City = () => {
   // Handle Edit Click
   const handleEdit = (item) => {
     setEditingId(item._id);
-    setCityName(item.city_name);
+    setOfficeCityName(item.office_city_name);
     setStatus(item.status);
     setShow(true);
   };
@@ -118,7 +118,7 @@ const City = () => {
     const worksheet = XLSX.utils.json_to_sheet(
       userData.map((a, index) => ({
         "Sr.No": index + 1,
-        "City Name": a.city_name,
+        "City Name": a.office_city_name,
         Status: a.status,
       }))
     );
@@ -135,7 +135,7 @@ const City = () => {
       head: [["Sr.No",  "City Name", "Status"]],
       body: userData.map((a, index) => [
         index + 1,
-        a.city_name,
+        a.office_city_name,
         a.status,
       ]),
       startY: 30,
@@ -146,7 +146,7 @@ const City = () => {
   // CSV data for export
   const csvData = userData.map((a, index) => ({
     "Sr.No": index + 1,
-    "City Name": a.city_name,
+    "City Name": a.office_city_name,
     Status: a.status,
   }));
 
@@ -182,7 +182,7 @@ const City = () => {
   const handleSearch = () => {
     const filteredData = userData.filter(
       (item) =>
-        item.city_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item.office_city_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         item.status.toLowerCase().includes(searchTerm.toLowerCase())
     );
     setUserData(filteredData); // Update the table data
@@ -225,8 +225,8 @@ const City = () => {
                   <Form.Control
                     type="text"
                     placeholder="Enter City Name"
-                    value={city_name}
-                    onChange={(e) => setCityName(e.target.value)}
+                    value={office_city_name}
+                    onChange={(e) => setOfficeCityName(e.target.value)}
                     required
                   />
                 </Col>
@@ -309,7 +309,7 @@ const City = () => {
             </Button> */}
         {/* Table */}
         <Col md={12} lg={12} lx={12} lxx={12} className="mt-3">
-          <h1 className="fw-bold text-center text-primary">City Data</h1>
+          <h1 className="fw-bold text-center text-primary">Office City Data</h1>
           {/* {loading ? (
             <p>Loading...</p>
           ) : ( */}
@@ -327,7 +327,7 @@ const City = () => {
                 {currentItems.map((a, index) => (
                   <tr key={index}>
                     <td>{index + 1 + (currentPage - 1) * itemsPerPage}</td>
-                    <td>{a.city_name}</td>
+                    <td>{a.office_city_name}</td>
                     <td>{a.status}</td>
                     <td className="d-flex justify-content-evenly">
                       <Button
@@ -390,4 +390,4 @@ const City = () => {
   );
 };
 
-export default City;
+export default OfficeCity;

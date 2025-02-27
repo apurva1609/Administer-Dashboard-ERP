@@ -11,16 +11,26 @@ import Modal from "react-bootstrap/Modal";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
 
-const City = () => {
+const Education = () => {
   const [show, setShow] = useState(false);
-
+  // const handleClose = () => {
+  //   if ( education_name || status !== "active") {
+  //     if (window.confirm("Are you sure you want to discard changes?")) {
+  //       setEducationName("");
+  //       setStatus("active");
+  //       setShow(false);
+  //     }
+  //   } else {
+  //     setShow(false);
+  //   }
+  // };
   const handleShow = () => setShow(true);
 
   const [userData, setUserData] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10); // Adjust as needed
 
-  const [city_name, setCityName] = useState("");
+  const [education_name, setEducationName] = useState("");
   const [status, setStatus] = useState("active"); // Default status
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [searchTerm, setSearchTerm] = useState(""); // Search input value
@@ -39,7 +49,7 @@ const City = () => {
   const showUsers = () => {
     // setLoading(true);
     axios
-      .get("http://localhost:8000/getdataCity")
+      .get("http://localhost:8000/getdataEducation")
       .then((res) => {
         setUserData(res.data.data);
         // setLoading(false);
@@ -53,37 +63,36 @@ const City = () => {
   // Handle Modal Close
   const handleClose = () => {
     setShow(false);
-    setCityName("");
+    setEducationName("");
     setStatus("active");
     setEditingId(null); // Reset editing state
   };
 
-  // const handleShow = () => setShow(true);
 
-  // Add or Update City
+  // Add or Update Education
   const handleSubmit = (e) => {
     e.preventDefault();
     setIsSubmitting(true);
 
-    const newData = { city_name, status };
+    const newData = { education_name, status };
 
     if (editingId) {
-      // Update existing City
+      // Update existing Education
       axios
-        .put(`http://localhost:8000/UpdateCity/${editingId}`, newData)
+        .put(`http://localhost:8000/UpdateEducation/${editingId}`, newData)
         .then(() => {
-          alert("City Updated Successfully!");
+          alert("Education Updated Successfully!");
           showUsers();
           handleClose();
         })
         .catch((err) => console.error(err))
         .finally(() => setIsSubmitting(false));
     } else {
-      // Add new City
+      // Add new Education
       axios
-        .post("http://localhost:8000/addCity", newData)
+        .post("http://localhost:8000/addEducation", newData)
         .then(() => {
-          alert("City Added Successfully!");
+          alert("Education Added Successfully!");
           showUsers();
           handleClose();
         })
@@ -92,13 +101,13 @@ const City = () => {
     }
   };
 
-  // Delete City
+  // Delete Education
   const deletedata = (_id) => {
     if (window.confirm("Are you sure you want to delete this record?")) {
       axios
-        .delete(`http://localhost:8000/deleteCity/${_id}`)
+        .delete(`http://localhost:8000/deleteEducation/${_id}`)
         .then(() => {
-          alert("City Deleted");
+          alert("Education Deleted");
           showUsers();
         })
         .catch((err) => console.error(err));
@@ -108,45 +117,47 @@ const City = () => {
   // Handle Edit Click
   const handleEdit = (item) => {
     setEditingId(item._id);
-    setCityName(item.city_name);
+    setEducationName(item.education_name);
     setStatus(item.status);
     setShow(true);
   };
+
+  
 
   // Export to Excel
   const handleExcel = () => {
     const worksheet = XLSX.utils.json_to_sheet(
       userData.map((a, index) => ({
         "Sr.No": index + 1,
-        "City Name": a.city_name,
+        "Education Name": a.education_name,
         Status: a.status,
       }))
     );
     const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "City Data");
-    XLSX.writeFile(workbook, "City-data.xlsx");
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Education Data");
+    XLSX.writeFile(workbook, "Education-data.xlsx");
   };
 
   // Export to PDF
   const handlePdf = () => {
     const doc = new jsPDF();
-    doc.text("City Data", 14, 22);
+    doc.text("Education Data", 14, 22);
     doc.autoTable({
-      head: [["Sr.No",  "City Name", "Status"]],
+      head: [["Sr.No", "Education ID", "Education Name", "Status"]],
       body: userData.map((a, index) => [
         index + 1,
-        a.city_name,
+        a.education_name,
         a.status,
       ]),
       startY: 30,
     });
-    doc.save("City-data.pdf");
+    doc.save("Education-data.pdf");
   };
 
   // CSV data for export
   const csvData = userData.map((a, index) => ({
     "Sr.No": index + 1,
-    "City Name": a.city_name,
+    "Education Name": a.education_name,
     Status: a.status,
   }));
 
@@ -182,7 +193,7 @@ const City = () => {
   const handleSearch = () => {
     const filteredData = userData.filter(
       (item) =>
-        item.city_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item.education_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         item.status.toLowerCase().includes(searchTerm.toLowerCase())
     );
     setUserData(filteredData); // Update the table data
@@ -205,28 +216,28 @@ const City = () => {
   return (
     <Container className="d-flex justify-content-end">
       <Row className="d-flex justify-content-center mt-5 pt-5">
-        {/* Add City Button */}
+        {/* Add Education Button */}
         <Col md={12} className="d-flex justify-content-end mb-2">
           <Button variant="primary" onClick={handleShow}>
-            Add City
+            Add Education
           </Button>
         </Col>
 
-        {/* Add City Modal */}
+        {/* Add Education Modal */}
         <Modal show={show} onHide={handleClose}>
           <Modal.Header closeButton>
-            <Modal.Title>Add City</Modal.Title>
+            <Modal.Title>Add Education</Modal.Title>
           </Modal.Header>
           <Modal.Body>
             <Form onSubmit={handleSubmit}>
               <Row>
                 <Col md={12}>
-                  <Form.Label>City Name</Form.Label>
+                  <Form.Label>Education Name</Form.Label>
                   <Form.Control
                     type="text"
-                    placeholder="Enter City Name"
-                    value={city_name}
-                    onChange={(e) => setCityName(e.target.value)}
+                    placeholder="Enter Education Name"
+                    value={education_name}
+                    onChange={(e) => setEducationName(e.target.value)}
                     required
                   />
                 </Col>
@@ -271,7 +282,7 @@ const City = () => {
         {/* Export Buttons */}
         <Col md={8} className="">
           {/* <ButtonGroup aria-label="Export Buttons"> */}
-          <CSVLink data={csvData} filename={"City-data.csv"} className="">
+          <CSVLink data={csvData} filename={"Education-data.csv"} className="">
             <Button variant="primary">CSV</Button>
           </CSVLink>
           <Button variant="primary" onClick={handleExcel} className="ms-1">
@@ -304,12 +315,9 @@ const City = () => {
           />
         </Col>
 
-        {/* <Button variant="primary" onClick={handleSearch} className="ms-2">
-              Search
-            </Button> */}
         {/* Table */}
         <Col md={12} lg={12} lx={12} lxx={12} className="mt-3">
-          <h1 className="fw-bold text-center text-primary">City Data</h1>
+          <h1 className="fw-bold text-center text-primary">Education Data</h1>
           {/* {loading ? (
             <p>Loading...</p>
           ) : ( */}
@@ -318,7 +326,7 @@ const City = () => {
               <thead>
                 <tr>
                   <th>Sr.No</th>
-                  <th>City Name</th>
+                  <th>Education Name</th>
                   <th>Status</th>
                   <th className="text-center">Action</th>
                 </tr>
@@ -327,7 +335,7 @@ const City = () => {
                 {currentItems.map((a, index) => (
                   <tr key={index}>
                     <td>{index + 1 + (currentPage - 1) * itemsPerPage}</td>
-                    <td>{a.city_name}</td>
+                    <td>{a.education_name}</td>
                     <td>{a.status}</td>
                     <td className="d-flex justify-content-evenly">
                       <Button
@@ -390,4 +398,4 @@ const City = () => {
   );
 };
 
-export default City;
+export default Education;

@@ -1,10 +1,10 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
-import { Button,  Col, Container, Form, Row, Table } from "react-bootstrap";
+import { Button, Col, Container, Form, Row, Table } from "react-bootstrap";
 import Pagination from "react-bootstrap/Pagination";
 import { AiFillDelete } from "react-icons/ai";
 import { GrEdit } from "react-icons/gr";
-import { useNavigate } from "react-router-dom";
+// import { useNavigate } from "react-router-dom";
 import { CSVLink } from "react-csv";
 import * as XLSX from "xlsx";
 import Modal from "react-bootstrap/Modal";
@@ -13,95 +13,113 @@ import "jspdf-autotable";
 
 const University = () => {
   const [show, setShow] = useState(false);
-  const handleClose = () => {
-    if ( university_name || status !== "active") {
-      if (window.confirm("Are you sure you want to discard changes?")) {
-        setName("");
-        setStatus("active");
-        setShow(false);
-      }
-    } else {
-      setShow(false);
-    }
-  };
+  // const handleClose = () => {
+  //   if ( university_name || status !== "active") {
+  //     if (window.confirm("Are you sure you want to discard changes?")) {
+  //       setUniversityName("");
+  //       setStatus("active");
+  //       setShow(false);
+  //     }
+  //   } else {
+  //     setShow(false);
+  //   }
+  // };
   const handleShow = () => setShow(true);
 
   const [userData, setUserData] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10); // Adjust as needed
-  const navigate = useNavigate();
 
-  const [university_name, setName] = useState("");
+  const [university_name, setUniversityName] = useState("");
   const [status, setStatus] = useState("active"); // Default status
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [searchTerm, setSearchTerm] = useState(""); // Search input value
+  const [editingId, setEditingId] = useState(null); // Track which ID is being edited
 
   // Fetch data on component mount
   useEffect(() => {
     showUsers();
   }, []);
 
-  // Fetch data from the API
+  // Fetch Data from API
+  useEffect(() => {
+    showUsers();
+  }, []);
+
   const showUsers = () => {
-    setLoading(true);
+    // setLoading(true);
     axios
       .get("http://localhost:8000/getdataUniversity")
       .then((res) => {
         setUserData(res.data.data);
-        setLoading(false);
+        // setLoading(false);
       })
       .catch((err) => {
-        console.log(err);
-        setLoading(false);
-        alert("Failed to fetch data. Please check your network connection or try again later.");
+        console.error(err);
+        // setLoading(false);
       });
   };
 
-  // Handle form submission
+  // Handle Modal Close
+  const handleClose = () => {
+    setShow(false);
+    setUniversityName("");
+    setStatus("active");
+    setEditingId(null); // Reset editing state
+  };
+
+
+  // Add or Update University
   const handleSubmit = (e) => {
     e.preventDefault();
     setIsSubmitting(true);
 
-    const newData = {
-      university_name,
-      status,
-    };
+    const newData = { university_name, status };
 
-    axios
-      .post("http://localhost:8000/addUniversity", newData)
-      .then((res) => {
-        console.log("Data Added:", res.data);
-        alert("Data Added Successfully!");
-        setName("");
-        setStatus("active");
-        handleClose();
-        showUsers(); // Refresh the table
-      })
-      .catch((err) => {
-        console.log(err);
-        alert("Failed to add data. Please try again.");
-      })
-      .finally(() => {
-        setIsSubmitting(false);
-      });
+    if (editingId) {
+      // Update existing University
+      axios
+        .put(`http://localhost:8000/UpdateUniversity/${editingId}`, newData)
+        .then(() => {
+          alert("University Updated Successfully!");
+          showUsers();
+          handleClose();
+        })
+        .catch((err) => console.error(err))
+        .finally(() => setIsSubmitting(false));
+    } else {
+      // Add new University
+      axios
+        .post("http://localhost:8000/addUniversity", newData)
+        .then(() => {
+          alert("University Added Successfully!");
+          showUsers();
+          handleClose();
+        })
+        .catch((err) => console.error(err))
+        .finally(() => setIsSubmitting(false));
+    }
   };
 
-  // Delete data
+  // Delete University
   const deletedata = (_id) => {
     if (window.confirm("Are you sure you want to delete this record?")) {
       axios
         .delete(`http://localhost:8000/deleteUniversity/${_id}`)
-        .then((res) => {
-          console.log("User Deleted:", res.data);
-          alert("User Deleted");
+        .then(() => {
+          alert("University Deleted");
           showUsers();
         })
-        .catch((error) => {
-          console.error("Error Deleting User:", error);
-          alert("Failed to delete user. Please check your network connection or try again.");
-        });
+        .catch((err) => console.error(err));
     }
+  };
+
+  // Handle Edit Click
+  const handleEdit = (item) => {
+    setEditingId(item._id);
+    setUniversityName(item.university_name);
+    setStatus(item.status);
+    setShow(true);
   };
 
   
@@ -111,32 +129,36 @@ const University = () => {
     const worksheet = XLSX.utils.json_to_sheet(
       userData.map((a, index) => ({
         "Sr.No": index + 1,
-        "Technology Name": a.university_name,
-        "Status": a.status,
+        "University Name": a.university_name,
+        Status: a.status,
       }))
     );
     const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Technology Data");
-    XLSX.writeFile(workbook, "technology-data.xlsx");
+    XLSX.utils.book_append_sheet(workbook, worksheet, "University Data");
+    XLSX.writeFile(workbook, "University-data.xlsx");
   };
 
   // Export to PDF
   const handlePdf = () => {
     const doc = new jsPDF();
-    doc.text("Technology Data", 14, 22);
+    doc.text("University Data", 14, 22);
     doc.autoTable({
-      head: [["Sr.No", "Technology ID", "Technology Name", "Status"]],
-      body: userData.map((a, index) => [index + 1, a.university_name, a.status]),
+      head: [["Sr.No", "University ID", "University Name", "Status"]],
+      body: userData.map((a, index) => [
+        index + 1,
+        a.university_name,
+        a.status,
+      ]),
       startY: 30,
     });
-    doc.save("technology-data.pdf");
+    doc.save("University-data.pdf");
   };
 
   // CSV data for export
   const csvData = userData.map((a, index) => ({
     "Sr.No": index + 1,
     "University Name": a.university_name,
-    "Status": a.status,
+    Status: a.status,
   }));
 
   // Pagination logic
@@ -169,9 +191,10 @@ const University = () => {
 
   // Handle search
   const handleSearch = () => {
-    const filteredData = userData.filter((item) =>
-      item.university_name.toLowerCase().includes(searchTerm.toLowerCase())||
-    item.status.toLowerCase().includes(searchTerm.toLowerCase())
+    const filteredData = userData.filter(
+      (item) =>
+        item.university_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item.status.toLowerCase().includes(searchTerm.toLowerCase())
     );
     setUserData(filteredData); // Update the table data
   };
@@ -193,17 +216,17 @@ const University = () => {
   return (
     <Container className="d-flex justify-content-end">
       <Row className="d-flex justify-content-center mt-5 pt-5">
-        {/* Add Technology Button */}
+        {/* Add University Button */}
         <Col md={12} className="d-flex justify-content-end mb-2">
           <Button variant="primary" onClick={handleShow}>
-            Add Technology
+            Add University
           </Button>
         </Col>
 
-        {/* Add Technology Modal */}
+        {/* Add University Modal */}
         <Modal show={show} onHide={handleClose}>
           <Modal.Header closeButton>
-            <Modal.Title>Add Technology</Modal.Title>
+            <Modal.Title>Add University</Modal.Title>
           </Modal.Header>
           <Modal.Body>
             <Form onSubmit={handleSubmit}>
@@ -214,7 +237,7 @@ const University = () => {
                     type="text"
                     placeholder="Enter University Name"
                     value={university_name}
-                    onChange={(e) => setName(e.target.value)}
+                    onChange={(e) => setUniversityName(e.target.value)}
                     required
                   />
                 </Col>
@@ -246,87 +269,94 @@ const University = () => {
             <Button variant="secondary" onClick={handleClose}>
               Close
             </Button>
-            <Button variant="primary" onClick={handleSubmit} disabled={isSubmitting}>
+            <Button
+              variant="primary"
+              onClick={handleSubmit}
+              disabled={isSubmitting}
+            >
               {isSubmitting ? "Saving..." : "Save Changes"}
             </Button>
           </Modal.Footer>
         </Modal>
 
         {/* Export Buttons */}
-        <Col md={6} className="">
+        <Col md={8} className="">
           {/* <ButtonGroup aria-label="Export Buttons"> */}
-            <CSVLink data={csvData} filename={"technology-data.csv"} className="">
-              <Button variant="primary">CSV</Button>
-            </CSVLink>
-            <Button variant="primary" onClick={handleExcel} className="ms-1">
-              Excel
-            </Button>
-            <Button variant="primary" onClick={handlePdf} className="ms-1">
-              PDF
-            </Button>
-            <Button variant="primary" onClick={() => window.print()} className="ms-1">
-              Print
-            </Button>
+          <CSVLink data={csvData} filename={"University-data.csv"} className="">
+            <Button variant="primary">CSV</Button>
+          </CSVLink>
+          <Button variant="primary" onClick={handleExcel} className="ms-1">
+            Excel
+          </Button>
+          <Button variant="primary" onClick={handlePdf} className="ms-1">
+            PDF
+          </Button>
+          <Button
+            variant="primary"
+            onClick={() => window.print()}
+            className="ms-1"
+          >
+            Print
+          </Button>
           {/* </ButtonGroup> */}
         </Col>
 
         {/* Search Input */}
-        <Col md={6} className="mb-3 d-flex">
+        <Col md={4} className="mb-3 d-flex">
           <Form.Label>Search:</Form.Label>
-          {/* <div className="d-flex"> */}
-            <Form.Control
-              type="text"
-              placeholder
-              value={searchTerm}
-              className="ms-2"
-              onChange={(e) => setSearchTerm(e.target.value)}
-              onKeyPress={handleKeyPress}
-              onChangeCapture={handleSearch}
-            />
-           
-          {/* </div> */}
+          <Form.Control
+            type="text"
+            placeholder
+            value={searchTerm}
+            className="ms-2"
+            onChange={(e) => setSearchTerm(e.target.value)}
+            onKeyPress={handleKeyPress}
+            onChangeCapture={handleSearch}
+          />
         </Col>
- {/* <Button variant="primary" onClick={handleSearch} className="ms-2">
-              Search
-            </Button> */}
+
         {/* Table */}
         <Col md={12} lg={12} lx={12} lxx={12} className="mt-3">
-          {loading ? (
+          <h1 className="fw-bold text-center text-primary">University Data</h1>
+          {/* {loading ? (
             <p>Loading...</p>
-          ) : (
-            <div style={{ overflowX: "auto" }}>
-              <Table striped bordered hover>
-                <thead>
-                  <tr>
-                    <th>Sr.No</th>
-                    <th>University Name</th>
-                    <th>Status</th>
-                    <th className="text-center">Action</th>
+          ) : ( */}
+          <div style={{ overflowX: "auto" }}>
+            <Table striped bordered hover>
+              <thead>
+                <tr>
+                  <th>Sr.No</th>
+                  <th>University Name</th>
+                  <th>Status</th>
+                  <th className="text-center">Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {currentItems.map((a, index) => (
+                  <tr key={index}>
+                    <td>{index + 1 + (currentPage - 1) * itemsPerPage}</td>
+                    <td>{a.university_name}</td>
+                    <td>{a.status}</td>
+                    <td className="d-flex justify-content-evenly">
+                      <Button
+                        variant="warning"
+                        onClick={() => handleEdit(a)}
+                      >
+                        <GrEdit />
+                      </Button>
+                      <Button
+                        variant="danger"
+                        onClick={() => deletedata(a._id)}
+                      >
+                        <AiFillDelete />
+                      </Button>
+                    </td>
                   </tr>
-                </thead>
-                <tbody>
-                  {currentItems.map((a, index) => (
-                    <tr key={index}>
-                      <td>{index + 1 + (currentPage - 1) * itemsPerPage}</td>
-                      <td>{a.university_name}</td>
-                      <td>{a.status}</td>
-                      <td className="d-flex justify-content-evenly">
-                        <Button
-                          variant="warning"
-                          onClick={() => navigate(`/Head/Update_pricing/${a.id}`)}
-                        >
-                          <GrEdit />
-                        </Button>
-                        <Button variant="danger" onClick={() => deletedata(a._id)}>
-                          <AiFillDelete />
-                        </Button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </Table>
-            </div>
-          )}
+                ))}
+              </tbody>
+            </Table>
+          </div>
+          {/* )} */}
         </Col>
 
         {/* Pagination */}
@@ -336,27 +366,32 @@ const University = () => {
               Showing {showingFrom} to {showingTo} of {totalEntries} entries
             </div>
           </Col>
+
           <Col md={6} className="d-flex justify-content-end">
-          <Pagination>
-            <Pagination.Prev
-              disabled={currentPage === 1}
-              onClick={() => setCurrentPage(currentPage - 1)}
-            />
-            {[...Array(totalPages)].map((_, index) => (
-              <Pagination.Item
-                key={index + 1}
-                active={index + 1 === currentPage}
-                onClick={() => setCurrentPage(index + 1)}
+            <Pagination>
+              <Pagination.Prev
+                disabled={currentPage === 1}
+                onClick={() => setCurrentPage(currentPage - 1)}
               >
-                {index + 1}
-              </Pagination.Item>
-            ))}
-            <Pagination.Next
-              disabled={currentPage === totalPages}
-              onClick={() => setCurrentPage(currentPage + 1)}
-            />
-          </Pagination>
-        </Col>
+                Previous
+              </Pagination.Prev>
+              {[...Array(totalPages)].map((_, index) => (
+                <Pagination.Item
+                  key={index + 1}
+                  active={index + 1 === currentPage}
+                  onClick={() => setCurrentPage(index + 1)}
+                >
+                  {index + 1}
+                </Pagination.Item>
+              ))}
+              <Pagination.Next
+                disabled={currentPage === totalPages}
+                onClick={() => setCurrentPage(currentPage + 1)}
+              >
+                Next
+              </Pagination.Next>
+            </Pagination>
+          </Col>
         </Row>
       </Row>
     </Container>

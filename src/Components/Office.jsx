@@ -4,42 +4,55 @@ import { Button, Col, Container, Form, Row, Table } from "react-bootstrap";
 import Pagination from "react-bootstrap/Pagination";
 import { AiFillDelete } from "react-icons/ai";
 import { GrEdit } from "react-icons/gr";
-// import { useNavigate } from "react-router-dom";
 import { CSVLink } from "react-csv";
 import * as XLSX from "xlsx";
 import Modal from "react-bootstrap/Modal";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
 
-const City = () => {
-  const [show, setShow] = useState(false);
-
+const Office = () => {
+  
+   const [show, setShow] = useState(false);
   const handleShow = () => setShow(true);
 
   const [userData, setUserData] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10); // Adjust as needed
 
-  const [city_name, setCityName] = useState("");
+  const [office_name, setOfficeName] = useState("");
+  const [office_city_name, setOfficeCityName] = useState("");
   const [status, setStatus] = useState("active"); // Default status
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [searchTerm, setSearchTerm] = useState(""); // Search input value
   const [editingId, setEditingId] = useState(null); // Track which ID is being edited
+  const [categories, setCategories] = useState([]);
+  // const [categoriesdata, setCategoriesData] = useState([]);
+  // const [categoryData, setCategoryData] = useState([]);
+  // const [category, setCategory] = useState([]);
 
-  // Fetch data on component mount
-  useEffect(() => {
-    showUsers();
-  }, []);
 
   // Fetch Data from API
   useEffect(() => {
     showUsers();
   }, []);
 
+  useEffect(() => {
+    axios
+      .get("http://localhost:8000/getdataOfficeCity")
+      .then((res) => {
+        setCategories(res.data.data); // Assuming the response contains a `data` array
+        // setCategoryData(res.data.data);
+        console.log("Categories fetched:", res.data.data);
+      })
+      .catch((err) => {
+        console.error("Error fetching categories:", err);
+      });
+  }, []);
+
   const showUsers = () => {
     // setLoading(true);
     axios
-      .get("http://localhost:8000/getdataCity")
+      .get("http://localhost:8000/getdataOffice")
       .then((res) => {
         setUserData(res.data.data);
         // setLoading(false);
@@ -50,65 +63,67 @@ const City = () => {
       });
   };
 
-  // Handle Modal Close
-  const handleClose = () => {
-    setShow(false);
-    setCityName("");
-    setStatus("active");
-    setEditingId(null); // Reset editing state
-  };
+// Handle Modal Close
+const handleClose = () => {
+  setShow(false);
+  setOfficeName("");
+  setOfficeCityName("");
+  setStatus("active");
+  setEditingId(null); // Reset editing state
+  
+};
 
-  // const handleShow = () => setShow(true);
 
-  // Add or Update City
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    setIsSubmitting(true);
+// Add or Update Technology
+const handleSubmit = (e) => {
+  e.preventDefault();
+  setIsSubmitting(true);
 
-    const newData = { city_name, status };
+  const newData = { office_name, office_city_name, status };
 
-    if (editingId) {
-      // Update existing City
-      axios
-        .put(`http://localhost:8000/UpdateCity/${editingId}`, newData)
-        .then(() => {
-          alert("City Updated Successfully!");
-          showUsers();
-          handleClose();
-        })
-        .catch((err) => console.error(err))
-        .finally(() => setIsSubmitting(false));
-    } else {
-      // Add new City
-      axios
-        .post("http://localhost:8000/addCity", newData)
-        .then(() => {
-          alert("City Added Successfully!");
-          showUsers();
-          handleClose();
-        })
-        .catch((err) => console.error(err))
-        .finally(() => setIsSubmitting(false));
-    }
-  };
+  if (editingId) {
+    // Update existing technology
+    axios
+      .put(`http://localhost:8000/UpdateOffice/${editingId}`, newData)
+      .then(() => {
+        alert("Technology Updated Successfully!");
+        showUsers();
+        handleClose();
+      })
+      .catch((err) => console.error(err))
+      .finally(() => setIsSubmitting(false));
+  } else {
+    // Add new technology
+    axios
+      .post("http://localhost:8000/addOffice", newData)
+      .then(() => {
+        alert("Technology Added Successfully!");
+        showUsers();
+        handleClose();
+      })
+      .catch((err) => console.error(err))
+      .finally(() => setIsSubmitting(false));
+  }
+};
 
-  // Delete City
+  // Delete data
   const deletedata = (_id) => {
     if (window.confirm("Are you sure you want to delete this record?")) {
       axios
-        .delete(`http://localhost:8000/deleteCity/${_id}`)
+        .delete(`http://localhost:8000/deleteOffice/${_id}`)
         .then(() => {
-          alert("City Deleted");
+          alert("Technology Deleted");
           showUsers();
         })
         .catch((err) => console.error(err));
     }
   };
 
-  // Handle Edit Click
+
   const handleEdit = (item) => {
     setEditingId(item._id);
-    setCityName(item.city_name);
+    setOfficeName(item.office_name);
+    setOfficeCityName(item.office_city_name);
     setStatus(item.status);
     setShow(true);
   };
@@ -118,35 +133,38 @@ const City = () => {
     const worksheet = XLSX.utils.json_to_sheet(
       userData.map((a, index) => ({
         "Sr.No": index + 1,
-        "City Name": a.city_name,
+        "Office Name": a.office_name,
+        "City Name": a.office_city_name,
         Status: a.status,
       }))
     );
     const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "City Data");
-    XLSX.writeFile(workbook, "City-data.xlsx");
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Office Data");
+    XLSX.writeFile(workbook, "Office-data.xlsx");
   };
 
   // Export to PDF
   const handlePdf = () => {
     const doc = new jsPDF();
-    doc.text("City Data", 14, 22);
+    doc.text("Office Data", 14, 22);
     doc.autoTable({
-      head: [["Sr.No",  "City Name", "Status"]],
+      head: [["Sr.No", "Office Name", "City Name", "Status"]],
       body: userData.map((a, index) => [
         index + 1,
-        a.city_name,
+        a.office_name,
+        a.office_city_name,
         a.status,
       ]),
       startY: 30,
     });
-    doc.save("City-data.pdf");
+    doc.save("Office-data.pdf");
   };
 
   // CSV data for export
   const csvData = userData.map((a, index) => ({
     "Sr.No": index + 1,
-    "City Name": a.city_name,
+    "Office Name": a.office_name,
+    "City Name": a.office_city_name,
     Status: a.status,
   }));
 
@@ -179,14 +197,33 @@ const City = () => {
   const totalEntries = userData.length;
 
   // Handle search
+  // const handleSearch = () => {
+  //   const filteredData = userData.filter(
+  //     (item) =>
+  //       item.university_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+  //       item.office_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+  //       item.office_city_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+  //       item.status.toLowerCase().includes(searchTerm.toLowerCase())
+  //   );
+  //   setUserData(filteredData); // Update the table data
+  // };
+
   const handleSearch = () => {
-    const filteredData = userData.filter(
-      (item) =>
-        item.city_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        item.status.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredData = userData.filter((item) => {
+    const OfficeName = item.office_name?.toLowerCase() || "";
+    const cityName = item.office_city_name?.toLowerCase() || "";
+    const statusValue = item.status?.toLowerCase() || "";
+
+    return (
+      OfficeName.includes(searchTerm.toLowerCase()) ||
+      cityName.includes(searchTerm.toLowerCase()) ||
+      statusValue.includes(searchTerm.toLowerCase())
     );
-    setUserData(filteredData); // Update the table data
-  };
+  });
+
+  setUserData(filteredData);
+};
+
 
   // Handle Enter key press
   const handleKeyPress = (e) => {
@@ -205,30 +242,48 @@ const City = () => {
   return (
     <Container className="d-flex justify-content-end">
       <Row className="d-flex justify-content-center mt-5 pt-5">
-        {/* Add City Button */}
+        {/* Add Office Button */}
         <Col md={12} className="d-flex justify-content-end mb-2">
           <Button variant="primary" onClick={handleShow}>
-            Add City
+            Add Office
           </Button>
         </Col>
 
-        {/* Add City Modal */}
+        {/* Add Office Modal */}
         <Modal show={show} onHide={handleClose}>
           <Modal.Header closeButton>
-            <Modal.Title>Add City</Modal.Title>
+            <Modal.Title>Add Office</Modal.Title>
           </Modal.Header>
           <Modal.Body>
             <Form onSubmit={handleSubmit}>
               <Row>
-                <Col md={12}>
-                  <Form.Label>City Name</Form.Label>
+                <Col md={12} className="mt-2">
+                  <Form.Label>Office Name</Form.Label>
                   <Form.Control
                     type="text"
-                    placeholder="Enter City Name"
-                    value={city_name}
-                    onChange={(e) => setCityName(e.target.value)}
+                    placeholder="Enter University Name"
+                    value={office_name}
+                    onChange={(e) => setOfficeName(e.target.value)}
                     required
                   />
+                </Col>
+                <Col md={12} className="mt-2">
+                  <Form.Label className="mt-3">
+                      <b>Select city</b>
+                    </Form.Label>
+                    <Form.Select
+                      aria-label="Select city"
+                      value={office_city_name}
+                      onChange={(e) => setOfficeCityName(e.target.value)}
+                      required
+                    >
+                      <option value="">Choose a city</option>
+                      {categories.map((city) => (
+                        <option key={city._id} value={city.office_city_name}>
+                          {city.office_city_name}
+                        </option>
+                      ))}
+                    </Form.Select>
                 </Col>
                 <Col md={12} className="d-flex mt-3">
                   <Form.Label>Status</Form.Label>
@@ -271,7 +326,11 @@ const City = () => {
         {/* Export Buttons */}
         <Col md={8} className="">
           {/* <ButtonGroup aria-label="Export Buttons"> */}
-          <CSVLink data={csvData} filename={"City-data.csv"} className="">
+          <CSVLink
+            data={csvData}
+            filename={"Office-data.csv"}
+            className="ms-1"
+          >
             <Button variant="primary">CSV</Button>
           </CSVLink>
           <Button variant="primary" onClick={handleExcel} className="ms-1">
@@ -304,51 +363,79 @@ const City = () => {
           />
         </Col>
 
-        {/* <Button variant="primary" onClick={handleSearch} className="ms-2">
-              Search
-            </Button> */}
         {/* Table */}
         <Col md={12} lg={12} lx={12} lxx={12} className="mt-3">
-          <h1 className="fw-bold text-center text-primary">City Data</h1>
-          {/* {loading ? (
-            <p>Loading...</p>
-          ) : ( */}
+          <h1 className="text-center text-primary fw-bold">Office Details</h1>
           <div style={{ overflowX: "auto" }}>
             <Table striped bordered hover>
               <thead>
                 <tr>
                   <th>Sr.No</th>
+                  <th>Office Name</th>
                   <th>City Name</th>
                   <th>Status</th>
                   <th className="text-center">Action</th>
                 </tr>
               </thead>
               <tbody>
-                {currentItems.map((a, index) => (
-                  <tr key={index}>
+              {/* {userData.length > 0 ? (
+                currentItems.map((product, index) => {
+                  const matchedCategory = categoryData.find((cat) => cat._id === product.office_city_name);
+                  const matched = category.find((cat) => cat._id === product.university_name);
+                  return (
+                    
+                  <tr key={product._id}>
                     <td>{index + 1 + (currentPage - 1) * itemsPerPage}</td>
-                    <td>{a.city_name}</td>
-                    <td>{a.status}</td>
+                    <td>{matched ? matched.university_name : "No Category"}</td>
+                    <td>{product.office_name}</td>
+                    <td>{matchedCategory ? matchedCategory.office_city_name : "No Category"}</td>
+                    <td>{product.status}</td>
                     <td className="d-flex justify-content-evenly">
-                      <Button
-                        variant="warning"
-                        onClick={() => handleEdit(a)}
-                      >
+                      <Button variant="warning" onClick={() => handleEdit(product)}>
                         <GrEdit />
                       </Button>
                       <Button
                         variant="danger"
-                        onClick={() => deletedata(a._id)}
+                        onClick={() => deletedata(product._id)}
                       >
                         <AiFillDelete />
                       </Button>
                     </td>
                   </tr>
-                ))}
+                    );
+                  })
+                ) : (
+                  <tr>
+                    <td colSpan="6" className="text-center">
+                      No products found.
+                    </td>
+                  </tr>
+                )} */}
+{currentItems.map((product, index) => {
+  return (
+<tr key={product._id}>
+                    <td>{index + 1 + (currentPage - 1) * itemsPerPage}</td>
+                    <td>{product.office_name}</td>
+                    <td>{product.office_city_name} </td>
+                    <td>{product.status}</td>
+                    <td className="d-flex justify-content-evenly">
+                      <Button variant="warning" onClick={() => handleEdit(product)}>
+                        <GrEdit />
+                      </Button>
+                      <Button
+                        variant="danger"
+                        onClick={() => deletedata(product._id)}
+                      >
+                        <AiFillDelete />
+                      </Button>
+                    </td>
+                  </tr>
+                  )
+                })
+}
               </tbody>
             </Table>
           </div>
-          {/* )} */}
         </Col>
 
         {/* Pagination */}
@@ -390,4 +477,4 @@ const City = () => {
   );
 };
 
-export default City;
+export default Office;

@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { Button, Col, Nav, Row, Image } from "react-bootstrap";
+import { Button, Col, Nav, Row } from "react-bootstrap";
+// import Image from "react-bootstrap";
 import { Link } from "react-router-dom";
 import { FaAddressBook, FaAddressCard, FaUserTie } from "react-icons/fa";
 import { LuLogIn } from "react-icons/lu";
@@ -10,7 +11,7 @@ import { IoPersonAddSharp } from "react-icons/io5";
 import { TfiLayoutAccordionMerged, TfiLayoutAccordionSeparated } from "react-icons/tfi";
 import { IoMdContacts } from "react-icons/io";
 import { GrServices } from "react-icons/gr";
-import image from "../Assets/Images/Group 6.png";
+// import image from "../Assets/Images/Group 6.png";
 
 const Sidebar = () => {
     const [show, setShow] = useState(false);
@@ -22,8 +23,8 @@ const Sidebar = () => {
         {`
           .sidebar{
           position: fixed;
-        //   background-color:rgb(86, 133, 141);
-          background-color:rgb(232, 233, 233);
+          background-color:rgb(86, 133, 141);
+          // background-color:rgb(232, 233, 233);
         //   background-color:rgb(252, 214, 233);
           height: 100%;
           width: 250px;
@@ -64,12 +65,10 @@ const Sidebar = () => {
       <div className="sidebar d-none d-md-block" >
         <Row>
           <Col className="" >
-            {/* <h4 className="px-3 py-3 text-secondary">Sumago Infotech </h4> */}
-            {/* <Image src={image} style={{height:"100px"}} className=" w-100"/> */}
             <br />
             <br />
-            {/* <br/> */}
-            <Image src={image} style={{height:"100px"}} className=" w-100 mt-2"/>
+            <br/>
+            {/* <Image src={image} style={{height:"100px"}} className=" w-100 mt-2"/> */}
             <Nav defaultActiveKey="/User"  className="flex-column link-unstyled">
               <Link
                 to="/Head/dashboard"

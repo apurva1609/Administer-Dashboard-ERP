@@ -102,6 +102,18 @@ const Sidebar = () => {
               >
                 <IoPersonAddSharp  size={25}className="me-2"/> City
               </Link>
+              <Link
+                to="/Head/city"
+                className="text-decoration-none link ps-3 py-2"
+              >
+                <IoPersonAddSharp  size={25}className="me-2"/> City
+              </Link>
+              <Link
+                to="/Head/city"
+                className="text-decoration-none link ps-3 py-2"
+              >
+                <IoPersonAddSharp  size={25}className="me-2"/> City
+              </Link>
 
              
               <Link to="/" className="text-decoration-none link ps-3 py-2">

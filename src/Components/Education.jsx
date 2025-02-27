@@ -11,7 +11,7 @@ import Modal from "react-bootstrap/Modal";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
 
-const Technology = () => {
+const Education = () => {
   const [show, setShow] = useState(false);
 
      const navigate = useNavigate()
@@ -467,7 +467,7 @@ const Technology = () => {
   );
 };
 
-export default Technology;
+export default Education;
 
 // import axios from "axios";
 // import React, { useEffect, useState } from "react";

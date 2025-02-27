@@ -20,7 +20,7 @@ const OfficeCity = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10); // Adjust as needed
 
-  const [city_name, setCityName] = useState("");
+  const [office_city_name, setCityName] = useState("");
   const [status, setStatus] = useState("active"); // Default status
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [searchTerm, setSearchTerm] = useState(""); // Search input value
@@ -65,7 +65,7 @@ const OfficeCity = () => {
     e.preventDefault();
     setIsSubmitting(true);
 
-    const newData = { city_name, status };
+    const newData = { office_city_name, status };
 
     if (editingId) {
       // Update existing City
@@ -108,7 +108,7 @@ const OfficeCity = () => {
   // Handle Edit Click
   const handleEdit = (item) => {
     setEditingId(item._id);
-    setCityName(item.city_name);
+    setCityName(item.office_city_name);
     setStatus(item.status);
     setShow(true);
   };
@@ -118,7 +118,7 @@ const OfficeCity = () => {
     const worksheet = XLSX.utils.json_to_sheet(
       userData.map((a, index) => ({
         "Sr.No": index + 1,
-        "City Name": a.city_name,
+        "City Name": a.office_city_name,
         Status: a.status,
       }))
     );
@@ -135,7 +135,7 @@ const OfficeCity = () => {
       head: [["Sr.No",  "City Name", "Status"]],
       body: userData.map((a, index) => [
         index + 1,
-        a.city_name,
+        a.office_city_name,
         a.status,
       ]),
       startY: 30,
@@ -146,7 +146,7 @@ const OfficeCity = () => {
   // CSV data for export
   const csvData = userData.map((a, index) => ({
     "Sr.No": index + 1,
-    "City Name": a.city_name,
+    "City Name": a.office_city_name,
     Status: a.status,
   }));
 
@@ -182,7 +182,7 @@ const OfficeCity = () => {
   const handleSearch = () => {
     const filteredData = userData.filter(
       (item) =>
-        item.city_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item.office_city_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         item.status.toLowerCase().includes(searchTerm.toLowerCase())
     );
     setUserData(filteredData); // Update the table data
@@ -225,7 +225,7 @@ const OfficeCity = () => {
                   <Form.Control
                     type="text"
                     placeholder="Enter City Name"
-                    value={city_name}
+                    value={office_city_name}
                     onChange={(e) => setCityName(e.target.value)}
                     required
                   />
@@ -327,7 +327,7 @@ const OfficeCity = () => {
                 {currentItems.map((a, index) => (
                   <tr key={index}>
                     <td>{index + 1 + (currentPage - 1) * itemsPerPage}</td>
-                    <td>{a.city_name}</td>
+                    <td>{a.office_city_name}</td>
                     <td>{a.status}</td>
                     <td className="d-flex justify-content-evenly">
                       <Button

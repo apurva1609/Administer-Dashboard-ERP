@@ -27,7 +27,7 @@ const College = () => {
   const [searchTerm, setSearchTerm] = useState(""); // Search input value
   const [editingId, setEditingId] = useState(null); // Track which ID is being edited
   const [categories, setCategories] = useState([]);
-  // const [categoriesdata, setCategoriesData] = useState([]);
+  const [categoriesdata, setCategoriesData] = useState([]);
   // const [categoryData, setCategoryData] = useState([]);
   // const [category, setCategory] = useState([]);
 
@@ -41,8 +41,8 @@ const College = () => {
     axios
       .get("http://localhost:8000/getdataUniversity")
       .then((res) => {
-        // setCategoriesData(res.data.data);
-        setCategories(res.data.data);  // Assuming the response contains a `data` array
+        setCategoriesData(res.data.data);
+        // setCategories(res.data.data);  // Assuming the response contains a `data` array
         // setCategory(res.data.data);
         console.log("Categories fetched:", res.data.data);
       })
@@ -298,7 +298,7 @@ const handleSubmit = (e) => {
                       required
                     >
                       <option value="">Choose a university</option>
-                      {categories.map((university) => (
+                      {categoriesdata.map((university) => (
                         <option key={university._id} value={university.university_name}>
                           {university.university_name}
                         </option>

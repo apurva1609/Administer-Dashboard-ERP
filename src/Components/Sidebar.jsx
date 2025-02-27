@@ -109,7 +109,7 @@ const Sidebar = () => {
                 <IoPersonAddSharp  size={25}className="me-2"/> Education
               </Link>
               <Link
-                to="/Head/office"
+                to="/Head/officecity"
                 className="text-decoration-none link ps-3 py-2"
               >
                 <IoPersonAddSharp  size={25}className="me-2"/> Office City

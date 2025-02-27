@@ -10,7 +10,7 @@ import image1 from "../Assets/Images/SUMAGO Logo.png";
 const Home = () => {
   return (
     <>
-      <Navbar expand="lg" className="" fixed='top' style={{ backgroundColor:"rgb(6, 22, 66)"}}>
+      <Navbar expand="lg" className="" fixed='top' style={{ backgroundColor:"rgb(77, 88, 117)"}}>
       <Container fluid>
         {/* <Navbar.Brand href="#" className='text-white fw-bold fs-2 ps-5 ' >Products</Navbar.Brand> */}
         <Image src={image1}  className=" w-25 h-25"/>

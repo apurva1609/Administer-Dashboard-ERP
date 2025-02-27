@@ -208,7 +208,7 @@ const OfficeCity = () => {
         {/* Add City Button */}
         <Col md={12} className="d-flex justify-content-end mb-2">
           <Button variant="primary" onClick={handleShow}>
-            Add City
+            Add Office City
           </Button>
         </Col>
 

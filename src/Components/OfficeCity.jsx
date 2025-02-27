@@ -20,7 +20,7 @@ const OfficeCity = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10); // Adjust as needed
 
-  const [office_city_name, setCityName] = useState("");
+  const [office_city_name, setOfficeCityName] = useState("");
   const [status, setStatus] = useState("active"); // Default status
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [searchTerm, setSearchTerm] = useState(""); // Search input value
@@ -53,7 +53,7 @@ const OfficeCity = () => {
   // Handle Modal Close
   const handleClose = () => {
     setShow(false);
-    setCityName("");
+    setOfficeCityName("");
     setStatus("active");
     setEditingId(null); // Reset editing state
   };
@@ -108,7 +108,7 @@ const OfficeCity = () => {
   // Handle Edit Click
   const handleEdit = (item) => {
     setEditingId(item._id);
-    setCityName(item.office_city_name);
+    setOfficeCityName(item.office_city_name);
     setStatus(item.status);
     setShow(true);
   };
@@ -226,7 +226,7 @@ const OfficeCity = () => {
                     type="text"
                     placeholder="Enter City Name"
                     value={office_city_name}
-                    onChange={(e) => setCityName(e.target.value)}
+                    onChange={(e) => setOfficeCityName(e.target.value)}
                     required
                   />
                 </Col>
@@ -309,7 +309,7 @@ const OfficeCity = () => {
             </Button> */}
         {/* Table */}
         <Col md={12} lg={12} lx={12} lxx={12} className="mt-3">
-          <h1 className="fw-bold text-center text-primary">City Data</h1>
+          <h1 className="fw-bold text-center text-primary">Office City Data</h1>
           {/* {loading ? (
             <p>Loading...</p>
           ) : ( */}

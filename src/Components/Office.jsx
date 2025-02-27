@@ -20,13 +20,15 @@ const Office = () => {
   const [itemsPerPage] = useState(10); // Adjust as needed
 
   const [office_name, setOfficeName] = useState("");
-  const [office_cityId, setOfficeCityName] = useState("");
+  const [office_city_name, setOfficeCityName] = useState("");
   const [status, setStatus] = useState("active"); // Default status
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [searchTerm, setSearchTerm] = useState(""); // Search input value
   const [editingId, setEditingId] = useState(null); // Track which ID is being edited
   const [categories, setCategories] = useState([]);
-  const [categoryData, setCategoryData] = useState([]);
+  // const [categoriesdata, setCategoriesData] = useState([]);
+  // const [categoryData, setCategoryData] = useState([]);
+  // const [category, setCategory] = useState([]);
 
 
   // Fetch Data from API
@@ -34,13 +36,12 @@ const Office = () => {
     showUsers();
   }, []);
 
-
   useEffect(() => {
     axios
       .get("http://localhost:8000/getdataOfficeCity")
       .then((res) => {
         setCategories(res.data.data); // Assuming the response contains a `data` array
-        setCategoryData(res.data.data);
+        // setCategoryData(res.data.data);
         console.log("Categories fetched:", res.data.data);
       })
       .catch((err) => {
@@ -73,30 +74,30 @@ const handleClose = () => {
 };
 
 
-// Add or Update Office
+// Add or Update Technology
 const handleSubmit = (e) => {
   e.preventDefault();
   setIsSubmitting(true);
 
-  const newData = { office_name, office_cityId, status };
+  const newData = { office_name, office_city_name, status };
 
   if (editingId) {
-    // Update existing Office
+    // Update existing technology
     axios
       .put(`http://localhost:8000/UpdateOffice/${editingId}`, newData)
       .then(() => {
-        alert("Office Updated Successfully!");
+        alert("Technology Updated Successfully!");
         showUsers();
         handleClose();
       })
       .catch((err) => console.error(err))
       .finally(() => setIsSubmitting(false));
   } else {
-    // Add new Office
+    // Add new technology
     axios
       .post("http://localhost:8000/addOffice", newData)
       .then(() => {
-        alert("Office Added Successfully!");
+        alert("Technology Added Successfully!");
         showUsers();
         handleClose();
       })
@@ -111,7 +112,7 @@ const handleSubmit = (e) => {
       axios
         .delete(`http://localhost:8000/deleteOffice/${_id}`)
         .then(() => {
-          alert("Office Deleted");
+          alert("Technology Deleted");
           showUsers();
         })
         .catch((err) => console.error(err));
@@ -122,7 +123,7 @@ const handleSubmit = (e) => {
   const handleEdit = (item) => {
     setEditingId(item._id);
     setOfficeName(item.office_name);
-    setOfficeCityName(item.office_cityId);
+    setOfficeCityName(item.office_city_name);
     setStatus(item.status);
     setShow(true);
   };
@@ -133,7 +134,7 @@ const handleSubmit = (e) => {
       userData.map((a, index) => ({
         "Sr.No": index + 1,
         "Office Name": a.office_name,
-        "Office City Name": a.city_name,
+        "City Name": a.office_city_name,
         Status: a.status,
       }))
     );
@@ -147,11 +148,11 @@ const handleSubmit = (e) => {
     const doc = new jsPDF();
     doc.text("Office Data", 14, 22);
     doc.autoTable({
-      head: [["Sr.No", "Office Name", "Office City Name", "Status"]],
+      head: [["Sr.No", "Office Name", "City Name", "Status"]],
       body: userData.map((a, index) => [
         index + 1,
         a.office_name,
-        a.city_name,
+        a.office_city_name,
         a.status,
       ]),
       startY: 30,
@@ -163,7 +164,7 @@ const handleSubmit = (e) => {
   const csvData = userData.map((a, index) => ({
     "Sr.No": index + 1,
     "Office Name": a.office_name,
-    "City Name": a.city_name,
+    "City Name": a.office_city_name,
     Status: a.status,
   }));
 
@@ -199,9 +200,9 @@ const handleSubmit = (e) => {
   // const handleSearch = () => {
   //   const filteredData = userData.filter(
   //     (item) =>
-  //       item.universityId.university_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+  //       item.university_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
   //       item.office_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-  //       item.office_cityId.city_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+  //       item.office_city_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
   //       item.status.toLowerCase().includes(searchTerm.toLowerCase())
   //   );
   //   setUserData(filteredData); // Update the table data
@@ -210,7 +211,7 @@ const handleSubmit = (e) => {
   const handleSearch = () => {
   const filteredData = userData.filter((item) => {
     const OfficeName = item.office_name?.toLowerCase() || "";
-    const cityName = item.office_cityId?.city_name?.toLowerCase() || "";
+    const cityName = item.office_city_name?.toLowerCase() || "";
     const statusValue = item.status?.toLowerCase() || "";
 
     return (
@@ -256,8 +257,6 @@ const handleSubmit = (e) => {
           <Modal.Body>
             <Form onSubmit={handleSubmit}>
               <Row>
-               
-                
                 <Col md={12} className="mt-2">
                   <Form.Label>Office Name</Form.Label>
                   <Form.Control
@@ -274,14 +273,14 @@ const handleSubmit = (e) => {
                     </Form.Label>
                     <Form.Select
                       aria-label="Select city"
-                      value={office_cityId}
+                      value={office_city_name}
                       onChange={(e) => setOfficeCityName(e.target.value)}
                       required
                     >
                       <option value="">Choose a city</option>
                       {categories.map((city) => (
-                        <option key={city._id} value={city._id}>
-                          {city.city_name}
+                        <option key={city._id} value={city.office_city_name}>
+                          {city.office_city_name}
                         </option>
                       ))}
                     </Form.Select>
@@ -366,28 +365,30 @@ const handleSubmit = (e) => {
 
         {/* Table */}
         <Col md={12} lg={12} lx={12} lxx={12} className="mt-3">
-          <h1 className="text-center text-primary fw-bold">Office Data</h1>
+          <h1 className="text-center text-primary fw-bold">Office Details</h1>
           <div style={{ overflowX: "auto" }}>
             <Table striped bordered hover>
               <thead>
                 <tr>
                   <th>Sr.No</th>
                   <th>Office Name</th>
-                  <th>Office City Name</th>
+                  <th>City Name</th>
                   <th>Status</th>
                   <th className="text-center">Action</th>
                 </tr>
               </thead>
               <tbody>
-              {userData.length > 0 ? (
+              {/* {userData.length > 0 ? (
                 currentItems.map((product, index) => {
-                  const matchedCategory = categoryData.find((cat) => cat._id === product.office_cityId);
+                  const matchedCategory = categoryData.find((cat) => cat._id === product.office_city_name);
+                  const matched = category.find((cat) => cat._id === product.university_name);
                   return (
                     
                   <tr key={product._id}>
                     <td>{index + 1 + (currentPage - 1) * itemsPerPage}</td>
+                    <td>{matched ? matched.university_name : "No Category"}</td>
                     <td>{product.office_name}</td>
-                    <td>{matchedCategory ? matchedCategory.city_name : "No Category"}</td>
+                    <td>{matchedCategory ? matchedCategory.office_city_name : "No Category"}</td>
                     <td>{product.status}</td>
                     <td className="d-flex justify-content-evenly">
                       <Button variant="warning" onClick={() => handleEdit(product)}>
@@ -409,7 +410,29 @@ const handleSubmit = (e) => {
                       No products found.
                     </td>
                   </tr>
-                )}
+                )} */}
+{currentItems.map((product, index) => {
+  return (
+<tr key={product._id}>
+                    <td>{index + 1 + (currentPage - 1) * itemsPerPage}</td>
+                    <td>{product.office_name}</td>
+                    <td>{product.office_city_name} </td>
+                    <td>{product.status}</td>
+                    <td className="d-flex justify-content-evenly">
+                      <Button variant="warning" onClick={() => handleEdit(product)}>
+                        <GrEdit />
+                      </Button>
+                      <Button
+                        variant="danger"
+                        onClick={() => deletedata(product._id)}
+                      >
+                        <AiFillDelete />
+                      </Button>
+                    </td>
+                  </tr>
+                  )
+                })
+}
               </tbody>
             </Table>
           </div>

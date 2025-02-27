@@ -10,6 +10,8 @@ import City from "./City";
 import Education from "./Education";
 import OfficeCity from "./OfficeCity";
 import Office from "./Office";
+import Courses from "./Courses";
+import GuestLecturer from "./GuestLecturer";
 
 const Head = () => {
   return (
@@ -30,6 +32,8 @@ const Head = () => {
               <Route path="/education" element={<Education />} />
               <Route path="/officecity" element={<OfficeCity />} />
               <Route path="/office" element={<Office />} />
+              <Route path ="/Courses" element={<Courses/>} />
+              <Route path ="/GuestLecturer" element={<GuestLecturer/>} /> 
             </Routes>
           </Container>
         </div>

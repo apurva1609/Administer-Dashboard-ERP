@@ -120,6 +120,18 @@ const Sidebar = () => {
               >
                 <IoPersonAddSharp  size={25}className="me-2"/> Office
               </Link>
+              <Link
+                to="/Head/Courses"
+                className="text-decoration-none link ps-3 py-2"
+              >
+                <IoPersonAddSharp  size={25}className="me-2"/> Courses
+              </Link>
+              <Link
+                to="/Head/GuestLecturer"
+                className="text-decoration-none link ps-3 py-2"
+              >
+                <IoPersonAddSharp  size={25}className="me-2"/> Guest Lecturer
+              </Link>
 
              
               <Link to="/" className="text-decoration-none link ps-3 py-2">

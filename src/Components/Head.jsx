@@ -9,6 +9,7 @@ import College from "./College";
 import City from "./City";
 import Office from "./Office";
 import Education from "./Education";
+import OfficeCity from "./OfficeCity";
 
 const Head = () => {
   return (
@@ -28,6 +29,7 @@ const Head = () => {
               <Route path="/city" element={<City />} />
               <Route path="/office" element={<Office />} />
               <Route path="/education" element={<Education />} />
+              <Route path="/officecity" element={<OfficeCity />} />
             </Routes>
           </Container>
         </div>
